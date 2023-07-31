@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <!-- Import uuid from a CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/uuid@8.3.2/dist/umd/uuidv4.min.js"></script>
+    <title>Document</title>
+</head>
+<body>
+    <input type="file" id="imageInput" />
+    <button onclick="uploadImage()">Upload Image</button>
+    <!-- Initialize Firebase and other JavaScript code -->
+    <script>
+        // Your web app's Firebase configuration
+        var firebaseConfig = {
+            apiKey: "AIzaSyANOkupeI8MQQFVv66-8nCTt4wxwpv-MQg",
+            authDomain: "cart-api-7eccb.firebaseapp.com",
+            projectId: "cart-api-7eccb",
+            storageBucket: "cart-api-7eccb.appspot.com",
+            messagingSenderId: "718883464604",
+            appId: "1:718883464604:web:077979695ff2860e291459",
+            measurementId: "G-WXWSR2LX8G"
+        };
+
+        // Check if Firebase has already been initialized
+        if (!firebase.apps.length) {
+            // Initialize Firebase
+            firebase.initializeApp(firebaseConfig);
+        }
+
+        var storage = firebase.storage();
+        var database = firebase.database();
+
+        function uploadImage() {
+            var imageInput = document.getElementById('imageInput');
+            var file = imageInput.files[0];
+            var storageRef = storage.ref(`images/${file.name}`);
+
+            // Generate a unique ID for the image
+            var imageId = generateUniqueId();
+
+            // Upload the file to Firebase Storage
+            storageRef.put(file).then((snapshot) => {
+                console.log('Image uploaded successfully!');
+                console.log('Image ID:', imageId);
+
+                // Store image ID in Firebase Realtime Database
+                saveImageIdToDatabase(imageId);
+            }).catch((error) => {
+                console.error('Error uploading image:', error);
+            });
+        }
+
+        function saveImageIdToDatabase(imageId) {
+            var imagesRef = database.ref('images');
+            imagesRef.push().set({
+                id: imageId,
+                uploadedAt: firebase.database.ServerValue.TIMESTAMP
+            });
+        }
+
+        function generateUniqueId() {
+            // Generate a unique ID for the image (using the 'uuid' library)
+            var imageId = uuidv4();
+            return imageId;
+        }
+    </script>
+</body>
+</html>

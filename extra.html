@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Your Webpage Title</title>
+  <!-- Include the core Firebase JavaScript SDK (version 9.1.3) -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-analytics.js";
+    // ...
+  </script>
+</head>
+<body>
+  <div id="cart-container"></div>
+  
+  <script src="app.js" type="module"></script><!-- Your webpage content goes here -->
+</body>
+</html>
+
+
+
+// Import the necessary functions from the Firebase SDK version 10.1.0
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-app.js";
+import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-firestore.js";
+
+// Your Firebase configuration object (firebaseConfig)
+const firebaseConfig = {
+  apiKey: "AIzaSyANOkupeI8MQQFVv66-8nCTt4wxwpv-MQg",
+  authDomain: "cart-api-7eccb.firebaseapp.com",
+  projectId: "cart-api-7eccb",
+  storageBucket: "cart-api-7eccb.appspot.com",
+  messagingSenderId: "718883464604",
+  appId: "1:718883464604:web:077979695ff2860e291459",
+  measurementId: "G-WXWSR2LX8G"
+};
+
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+
+// Your code to fetch Firestore documents
+const q = query(collection(db, "Cart API"), where("capital", "==", true));
+
+// Initialize an empty array to store the cart items
+const cartItems = [];
+
+// Use an asynchronous function to fetch the documents
+async function fetchDocuments() {
+  try {
+    const querySnapshot = await getDocs(q);
+    querySnapshot.forEach((doc) => {
+      // Add the document data to the cartItems array
+      cartItems.push(doc.data());
+    });
+    console.log("Documents fetched successfully.");
+    // After fetching the documents, call the function to display the cart items
+    displayCartItems();
+  } catch (error) {
+    console.error("Error fetching documents: ", error);
+  }
+}
+
+// Call the function to fetch the documents
+fetchDocuments();
+
+
+
+function displayCartItems() {
+  // Get the element in which you want to display the cart items (e.g., a div with id "cart-container")
+  const cartContainer = document.getElementById("cart-container");
+
+  // Clear any existing content in the cart container
+  cartContainer.innerHTML = "";
+
+  // Loop through the cartItems array and create the HTML elements to display each cart item
+  cartItems.forEach((item) => {
+    const cartItemElement = document.createElement("div");
+    cartItemElement.innerHTML = `
+      <img src="${item.image}" alt="${item.title}" style="width: 100px; height: 100px;">
+      <h2>${item.title}</h2>
+      <p>${item.description}</p>
+    `;
+    cartContainer.appendChild(cartItemElement);
+  });
+}
+
+
